@@ -14,6 +14,6 @@ A simple library for dragging things around. Tracks dragging with touch or mouse
 
 All options are optional. Without a `callback`, the coordinates are written to `console.log`.
 
-*) Center for SVG `<circle>`s
+*) Center for SVG `<circle>`s and `<ellipse>`s
 
 **Demo**: https://codepen.io/Sphinxxxx/pen/KXedQe
