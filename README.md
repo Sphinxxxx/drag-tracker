@@ -8,9 +8,10 @@ A simple library for dragging things around. Tracks dragging with touch or mouse
       container:          /* The element the user can drag within */,
       selector:           /* CSS selector for elements inside the container that are draggable */,
       
-      callback:           /* Your code wich decides what happens during a drag operation */,
-      callbackStart:      /* Optional callback when a drag operation is about to start */,
-      callbackEnd:        /* Optional callback when a drag operation has ended */,
+      callback:           /* Your code which decides what happens during a drag operation */,
+      callbackDragStart:  /* Optional callback when a drag operation is about to start */,
+      callbackDragEnd:    /* Optional callback when a drag operation has ended */,
+      callbackClick:      /* Optional callback when a draggable element is only clicked, not dragged */,
       
       roundCoords:  true  /* Whether callback coordinates should be integers */,
       dragOutside:  true  /* Whether the draggable elements can be dragged outside the bounds of the container */,

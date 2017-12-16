@@ -1,0 +1,88 @@
+body {
+  text-align: center;
+  font-family: Georgia, sans-serif;
+  background: skyblue;
+}
+body h2 {
+  font-size: 1.1em;
+  margin-top: 0;
+  text-align: center;
+}
+
+#basic, section {
+  display: inline-block;
+  vertical-align: top;
+  text-align: left;
+}
+
+@media (max-width: 1500px) {
+  #basic section {
+    display: block;
+  }
+}
+
+section {
+  margin: 1em;
+  padding: 1em;
+  background: honeydew;
+}
+section .container {
+  width: 400px;
+  height: 400px;
+  background: white;
+  outline: 3px dashed #aaa;
+}
+
+#basic-html .container {
+  position: relative;
+}
+#basic-html .container .box, #basic-html .container .not-a-box {
+  position: absolute;
+  width: 100px;
+  height: 60px;
+  text-align: center;
+}
+#basic-html .container .box:nth-child(2), #basic-html .container .not-a-box:nth-child(2) {
+  top: 300px;
+  left: 50px;
+}
+#basic-html .container .box:nth-child(3), #basic-html .container .not-a-box:nth-child(3) {
+  top: 100px;
+  left: 250px;
+}
+#basic-html .container .box {
+  background: dodgerblue;
+  cursor: move;
+}
+#basic-html .container .not-a-box {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+  background: tomato;
+}
+
+#advanced-vue svg .line line {
+  stroke: dodgerblue;
+  stroke-width: 3;
+  pointer-events: none;
+}
+#advanced-vue svg circle[data-draggable] {
+  stroke: limegreen;
+  stroke-width: 3;
+  stroke-dasharray: 6;
+  fill: rgba(255, 255, 0, 0.4);
+  cursor: move;
+}
+#advanced-vue svg circle[data-draggable].selected {
+  stroke: tomato;
+  stroke-width: 4;
+}
+#advanced-vue input {
+  vertical-align: middle;
+}
+#advanced-vue pre {
+  background: #fefefe;
+  border: 1px solid gainsboro;
+}

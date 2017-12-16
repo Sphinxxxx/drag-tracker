@@ -1,0 +1,67 @@
+<html>
+    <head>
+        <title>drag-tracker demo</title>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.4/vue.min.js"></script>
+        <script src="../src/drag-tracker.js"></script>
+
+        <link href="styles.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        
+        <h1><a href="https://github.com/Sphinxxxx/drag-tracker" target="_blank">drag-tracker</a> demo</h1>
+        
+        <div id="basic">
+            <section id="basic-html">
+                <h2>Simple HTML element dragging</h2>
+                <div class="container">
+                    <div class="not-a-box">Can't touch this</div>
+                    <div class="box">Drag me!</div>
+                    <div class="box">Drag me!</div>
+                </div>
+            </section>
+        
+            <section id="basic-canvas">
+                <h2>Draw on canvas</h2>
+                <canvas class="container"></canvas>
+            </section>
+        </div>
+        
+        <section id="advanced-vue">
+            <h2>SVG dragging bound (sort of) to Vue.js state</h2>
+            <svg class="container">
+                <g class="node" v-for="p in svg.nodes">
+                    <drag-node :p="p"></drag-node>
+                </g>
+                <g class="line" v-for="(l, i) in svg.lines">
+                    <line :x1="l.start.coord[0]" :y1="l.start.coord[1]" 
+                          :x2="l  .end.coord[0]" :y2="l  .end.coord[1]" />
+                    <drag-node class="start" :p="l.start"></drag-node>
+                    <drag-node class="end"   :p="l.end"  ></drag-node>
+                </g>
+            </svg>
+            
+            <p>
+                <button id="add-node" @click="addNode">Add node</button>
+                <button id="add-line" @click="addLine">Add line</button>
+                <br>
+                <label>Size of selected node: <input id="size" type="range" min="1" max="50" v-model="svg.nodeRadius" /></label>
+            </p>
+        
+            <pre>_svgState = {{ svg | prettyCompact }}</pre>
+        </section>
+
+
+        <!--script src="scss2css-light.js"></script>
+        <script>
+            fetch('styles.scss')
+                .then(r => r.text())
+                .then(t => {
+                    var css = scss2css(t);
+                    console.log(css);
+                    document.body.appendChild(document.createElement('style')).textContent = css;
+                });
+        </script-->
+        <script src="main.js"></script>
+    </body>
+</html>

@@ -21,14 +21,19 @@ function dragTracker(options) {
 
     options = options || {};
     const container = options.container || document.documentElement,
+          selector = options.selector,
+
           callback = options.callback || console.log,
           callbackStart = options.callbackDragStart,
           callbackEnd = options.callbackDragEnd,
-          selector = options.selector,
-          //handleOffset: "center", true (default), false
-          handleOffset = options.handleOffset || (options.handleOffset !== false),
+          //dragTracker may not play well with additional click events on the same container,
+          //so we include the opportunity to register clicks as well:
+          callbackClick = options.callbackClick /*|| function(a, b, c) { console.log('click', a, b, c); }*/,
+
           roundCoords = (options.roundCoords !== false),
-          dragOutside = (options.dragOutside !== false)
+          dragOutside = (options.dragOutside !== false),
+          //handleOffset: "center", true (default), false
+          handleOffset = options.handleOffset || (options.handleOffset !== false)
     ;
     //Whether callback coordinates should be the dragged element's center instead of the top-left corner
     let offsetToCenter = null;
@@ -86,6 +91,7 @@ function dragTracker(options) {
         dragged = selector ? e.target.closest(selector) : {};
         if(dragged) {
             e.preventDefault();
+            e.stopPropagation();
 
             mouseOffset = (selector && handleOffset) ? getMousePos(e, dragged) : [0, 0];
             dragStart = getMousePos(e, container, mouseOffset);
@@ -100,6 +106,7 @@ function dragTracker(options) {
     function onMove(e) {
         if(!dragged) { return; }
         e.preventDefault();
+        e.stopPropagation();
 
         const pos = getMousePos(e, container, mouseOffset, !dragOutside);
         callback(dragged, pos, dragStart);
@@ -108,9 +115,16 @@ function dragTracker(options) {
     function onEnd(e) {
         if(!dragged) { return; }
 
-        if(callbackEnd) {
+        if(callbackEnd || callbackClick) {
             const pos = getMousePos(e, container, mouseOffset, !dragOutside);
-            callbackEnd(dragged, pos, dragStart);
+
+            if(callbackClick && (dragStart[0] === pos[0]) && (dragStart[1] === pos[1])) {
+                callbackClick(dragged, dragStart);
+            }
+            //Call callbackEnd even if this was only a click, because we already called callbackStart:
+            if(callbackEnd) {
+                callbackEnd(dragged, pos, dragStart);
+            }
         }
         dragged = null;
     }
@@ -121,7 +135,7 @@ function dragTracker(options) {
         if(isLeftButton(e)) { onDown(e); }
     });
     container.addEventListener('touchstart', function(e) {
-        onDown(tweakTouch(e));
+        relayTouch(e, onDown);
     });
 
     window.addEventListener('mousemove', function(e) {
@@ -132,12 +146,12 @@ function dragTracker(options) {
         else { onEnd(e); }
     });
     window.addEventListener('touchmove', function(e) {
-        onMove(tweakTouch(e));
+        relayTouch(e, onMove);
     });
 
-    container.addEventListener('mouseup', function(e) {
+    window.addEventListener('mouseup', function(e) {
         //Here we check that the left button is *no longer* pressed:
-        if(!isLeftButton(e)) { onEnd(e); }
+        if(dragged && !isLeftButton(e)) { onEnd(e); }
     });
     function onTouchEnd(e) { onEnd(tweakTouch(e)); }
     container.addEventListener('touchend', onTouchEnd);
@@ -147,9 +161,14 @@ function dragTracker(options) {
     function isLeftButton(e) {
         return (e.buttons !== undefined)
             ? (e.buttons === 1)
-            //Safari (not tested):
-            //https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent#Browser_compatibility
+            //Safari: https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent#Browser_compatibility
             : (e.which === 1);
+    }
+    function relayTouch(e, handler) {
+        //Don't interfere with pinch operations - those are probably handled somewhere else..
+        if(e.touches.length !== 1) { onEnd(e); return; }
+
+        handler(tweakTouch(e));
     }
     function tweakTouch(e) {
         let touch = e.targetTouches[0];
@@ -157,6 +176,7 @@ function dragTracker(options) {
         if(!touch) { touch = e.changedTouches[0]; }
         
         touch.preventDefault = e.preventDefault.bind(e);
+        touch.stopPropagation = e.stopPropagation.bind(e);
         return touch;
     }
 }
