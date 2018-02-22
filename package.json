@@ -1,0 +1,33 @@
+{
+  "name": "drag-tracker",
+  "version": "0.4.0",
+  "description": "A simple library for dragging things around. Tracks dragging with touch or mouse.",
+  "main": "dist/drag-tracker.js",
+  "module": "src/drag-tracker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sphinxxxx/drag-tracker.git"
+  },
+  "author": "Andreas Borgen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Sphinxxxx/drag-tracker/issues"
+  },
+  "homepage": "https://github.com/Sphinxxxx/drag-tracker#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
+    "gulp": "^4.0.0",
+    "gulp-file": "^0.4.0",
+    "gulp-header": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-strip-comments": "^2.5.2",
+    "gulp-uglify": "^3.0.0",
+    "rollup": "^0.56.2",
+    "rollup-plugin-babel": "^3.0.3"
+  }
+}

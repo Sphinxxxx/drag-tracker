@@ -1,5 +1,6 @@
 function dragTracker(options) {
     "use strict";
+    /*global Element*/
     
     //Element.closest polyfill:
     //https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
@@ -28,7 +29,7 @@ function dragTracker(options) {
           callbackEnd = options.callbackDragEnd,
           //dragTracker may not play well with additional click events on the same container,
           //so we include the opportunity to register clicks as well:
-          callbackClick = options.callbackClick /*|| function(a, b, c) { console.log('click', a, b, c); }*/,
+          callbackClick = options.callbackClick,
 
           roundCoords = (options.roundCoords !== false),
           dragOutside = (options.dragOutside !== false),
@@ -180,3 +181,5 @@ function dragTracker(options) {
         return touch;
     }
 }
+
+export default dragTracker;

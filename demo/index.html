@@ -1,10 +1,6 @@
 <html>
     <head>
         <title>drag-tracker demo</title>
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.4/vue.min.js"></script>
-        <script src="../src/drag-tracker.js"></script>
-
         <link href="styles.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
@@ -51,17 +47,8 @@
             <pre>_svgState = {{ svg | prettyCompact }}</pre>
         </section>
 
-
-        <!--script src="scss2css-light.js"></script>
-        <script>
-            fetch('styles.scss')
-                .then(r => r.text())
-                .then(t => {
-                    var css = scss2css(t);
-                    console.log(css);
-                    document.body.appendChild(document.createElement('style')).textContent = css;
-                });
-        </script-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.4/vue.min.js"></script>
+        <script src="../dist/drag-tracker.js"></script>
         <script src="main.js"></script>
     </body>
 </html>

@@ -2,7 +2,12 @@
 
 A simple library for dragging things around. Tracks dragging with touch or mouse (left button).
 
-## Usage ##
+## Demo
+
+https://rawgit.com/Sphinxxxx/drag-tracker/master/demo/index.html  
+https://codepen.io/Sphinxxxx/pen/KXedQe
+
+## Usage
 
     dragTracker({
       container:          /* The element the user can drag within */,
@@ -24,5 +29,3 @@ A simple library for dragging things around. Tracks dragging with touch or mouse
     });
 
 All options are optional. Without a `callback`, the coordinates are written to `console.log`.
-
-**Demo**: https://codepen.io/Sphinxxxx/pen/KXedQe
