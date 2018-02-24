@@ -25,7 +25,9 @@ import * as pkg from './package.json';
 
 
 const globalName = 'dragTracker',
-      outFolder = 'dist/';
+      outFolder = 'dist/',
+      //Remove scope (if any) from output path:
+      outFile = pkg.name.replace(/.*\//, '');
 
 const myBanner = `/*!
  * <%= pkg.name %> v<%= pkg.version %>
@@ -39,8 +41,7 @@ const myBanner = `/*!
 
 gulp.task('build', function() {
     return rollup({
-        input: 'index.js',
-        //input: `src/${pkg.name}.js`,
+        input: pkg.module,
         plugins: [
           babel({
             babelrc: false,
@@ -66,7 +67,7 @@ gulp.task('build', function() {
         }
         //*/
     
-        const cleanStream = file(pkg.name + '.js', gen.code, { src: true })
+        const cleanStream = file(outFile + '.js', gen.code, { src: true })
                               .pipe(strip())
         //output(cleanStream);
             .pipe(header(myBanner, { pkg : pkg }))
@@ -79,7 +80,7 @@ gulp.task('build', function() {
             .pipe(rename({ extname: '.min.js' }))
             .pipe(uglify())
 
-            .pipe(header(myBanner, { pkg : pkg }))
+            .pipe(header(myBanner, { pkg: pkg }))
             .pipe(gulp.dest(outFolder));
         //);
     });
