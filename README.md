@@ -11,12 +11,13 @@ https://codepen.io/Sphinxxxx/pen/KXedQe
 
     dragTracker({
       container:          /* The element the user can drag within */,
-      selector:           /* CSS selector for elements inside the container that are draggable */,
+      selector:           /* CSS selector for elements inside the container that are draggable, or a single HTML element */,
       
       callback:           /* Your code which decides what happens during a drag operation */,
       callbackDragStart:  /* Optional callback when a drag operation is about to start */,
       callbackDragEnd:    /* Optional callback when a drag operation has ended */,
       callbackClick:      /* Optional callback when a draggable element is only clicked, not dragged */,
+      propagateEvents:    /* Whether to let mouse/touch events propagate (bubble) after being handled. Usually not wanted in case multiple handlers track the same container */,
       
       roundCoords:  true  /* Whether callback coordinates should be integers */,
       dragOutside:  true  /* Whether the draggable elements can be dragged outside the bounds of the container */,

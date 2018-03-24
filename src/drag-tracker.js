@@ -30,6 +30,7 @@ function dragTracker(options) {
           //dragTracker may not play well with additional click events on the same container,
           //so we include the opportunity to register clicks as well:
           callbackClick = options.callbackClick,
+          propagate = options.propagateEvents,
 
           roundCoords = (options.roundCoords !== false),
           dragOutside = (options.dragOutside !== false),
@@ -87,12 +88,27 @@ function dragTracker(options) {
         }
         return (roundCoords ? [Math.round(x), Math.round(y)] : [x, y]);
     }
+    
+    function stopEvent(e) {
+        e.preventDefault();
+        if(!propagate) {
+            e.stopPropagation();
+        }
+    }
 
     function onDown(e) {
-        dragged = selector ? e.target.closest(selector) : {};
+        if(selector) {
+            dragged = (selector instanceof Element)
+                            ? (selector.contains(e.target) ? selector : null)
+                            : e.target.closest(selector);
+        }
+        else {
+            //No specific targets, just register dragging within the container. Create a dummy object so 'dragged' isn't falsy:
+            dragged = {};
+        }
+
         if(dragged) {
-            e.preventDefault();
-            e.stopPropagation();
+            stopEvent(e);
 
             mouseOffset = (selector && handleOffset) ? getMousePos(e, dragged) : [0, 0];
             dragStart = getMousePos(e, container, mouseOffset);
@@ -106,8 +122,7 @@ function dragTracker(options) {
 
     function onMove(e) {
         if(!dragged) { return; }
-        e.preventDefault();
-        e.stopPropagation();
+        stopEvent(e);
 
         const pos = getMousePos(e, container, mouseOffset, !dragOutside);
         callback(dragged, pos, dragStart);

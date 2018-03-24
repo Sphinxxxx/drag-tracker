@@ -1,5 +1,5 @@
 /*!
- * drag-tracker v0.4.2
+ * drag-tracker v0.4.3
  * https://github.com/Sphinxxxx/drag-tracker#readme
  *
  * Copyright 2017-2018 Andreas Borgen
@@ -34,6 +34,7 @@ function dragTracker(options) {
         callbackEnd = options.callbackDragEnd,
 
     callbackClick = options.callbackClick,
+        propagate = options.propagateEvents,
         roundCoords = options.roundCoords !== false,
         dragOutside = options.dragOutside !== false,
 
@@ -86,11 +87,22 @@ function dragTracker(options) {
         return roundCoords ? [Math.round(x), Math.round(y)] : [x, y];
     }
 
-    function onDown(e) {
-        dragged = selector ? e.target.closest(selector) : {};
-        if (dragged) {
-            e.preventDefault();
+    function stopEvent(e) {
+        e.preventDefault();
+        if (!propagate) {
             e.stopPropagation();
+        }
+    }
+
+    function onDown(e) {
+        if (selector) {
+            dragged = selector instanceof Element ? selector.contains(e.target) ? selector : null : e.target.closest(selector);
+        } else {
+            dragged = {};
+        }
+
+        if (dragged) {
+            stopEvent(e);
 
             mouseOffset = selector && handleOffset ? getMousePos(e, dragged) : [0, 0];
             dragStart = getMousePos(e, container, mouseOffset);
@@ -108,8 +120,7 @@ function dragTracker(options) {
         if (!dragged) {
             return;
         }
-        e.preventDefault();
-        e.stopPropagation();
+        stopEvent(e);
 
         var pos = getMousePos(e, container, mouseOffset, !dragOutside);
         callback(dragged, pos, dragStart);
