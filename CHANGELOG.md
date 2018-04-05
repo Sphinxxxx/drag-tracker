@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 ## [Unreleased]
+
+
+## [1.0.0] - 2018-04-05
 ### Added
 - Signal cancelled drag operations in `callbackDragEnd`.
 
@@ -22,5 +25,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## 0.4.1 - 2018-02-22
 
 
-[Unreleased]: https://github.com/Sphinxxxx/drag-tracker/compare/v0.4.3...HEAD
+[Unreleased]: https://github.com/Sphinxxxx/drag-tracker/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/Sphinxxxx/drag-tracker/compare/v0.4.3...v1.0.0
 [0.4.3]: https://github.com/Sphinxxxx/drag-tracker/compare/v0.4.1...v0.4.3
