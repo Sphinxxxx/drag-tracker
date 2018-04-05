@@ -1,5 +1,5 @@
 /*!
- * drag-tracker v0.4.4
+ * drag-tracker v0.4.5
  * https://github.com/Sphinxxxx/drag-tracker#readme
  *
  * Copyright 2017-2018 Andreas Borgen
