@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 ## [Unreleased]
+### Added
+- Signal cancelled drag operations in `callbackDragEnd`.
 
 
 ## [0.4.3] - 2018-03-25
@@ -17,8 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Option `selector` can be a single specific HTML element, and not just a CSS selector.
 
 
-## 0.4.2 - 2018-02-24
+## 0.4.1 - 2018-02-22
 
 
 [Unreleased]: https://github.com/Sphinxxxx/drag-tracker/compare/v0.4.3...HEAD
-[0.4.3]: https://github.com/Sphinxxxx/drag-tracker/compare/v0.4.2...v0.4.3
+[0.4.3]: https://github.com/Sphinxxxx/drag-tracker/compare/v0.4.1...v0.4.3

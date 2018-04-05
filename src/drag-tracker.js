@@ -1,3 +1,6 @@
+const root = window;
+
+
 function dragTracker(options) {
     "use strict";
     /*global Element*/
@@ -162,7 +165,7 @@ function dragTracker(options) {
 
     /* Mouse/touch input */
 
-    container.addEventListener('mousedown', function(e) {
+    addEvent(container, 'mousedown', function(e) {
         if(isLeftButton(e)) {
             onDown(e);
         }
@@ -170,30 +173,35 @@ function dragTracker(options) {
             onEnd(e, true);
         }
     });
-    container.addEventListener('touchstart', function(e) {
-        relayTouch(e, onDown);
-    });
+    addEvent(container, 'touchstart', e => relayTouch(e, onDown));
 
-    window.addEventListener('mousemove', function(e) {
+
+    addEvent(root, 'mousemove', function(e) {
         if(!dragState) { return; }
 
-        if(isLeftButton(e)) { onMove(e); }
+        if(isLeftButton(e)) {
+            onMove(e);
+        }
         //"mouseup" outside of window
-        else { onEnd(e); }
+        else {
+            onEnd(e);
+        }
     });
-    window.addEventListener('touchmove', function(e) {
-        relayTouch(e, onMove);
-    });
+    addEvent(root, 'touchmove', e => relayTouch(e, onMove));
 
-    window.addEventListener('mouseup', function(e) {
+
+    addEvent(container, 'mouseup', function(e) {
         //Here we check that the left button is *no longer* pressed:
         if(dragState && !isLeftButton(e)) { onEnd(e); }
     });
     function onTouchEnd(e, cancelled) { onEnd(tweakTouch(e), cancelled); }
-    container.addEventListener('touchend',    e => onTouchEnd(e));
-    container.addEventListener('touchcancel', e => onTouchEnd(e, true));
+    addEvent(container, 'touchend',    e => onTouchEnd(e));
+    addEvent(container, 'touchcancel', e => onTouchEnd(e, true));
 
 
+    function addEvent(target, type, handler) {
+        target.addEventListener(type, handler);
+    }
     function isLeftButton(e) {
         return (e.buttons !== undefined)
             ? (e.buttons === 1)

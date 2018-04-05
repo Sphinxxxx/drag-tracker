@@ -11,6 +11,8 @@
 	(global.dragTracker = factory());
 }(this, (function () { 'use strict';
 
+var root = window;
+
 function dragTracker(options) {
 
 
@@ -152,18 +154,18 @@ function dragTracker(options) {
     }
 
 
-    container.addEventListener('mousedown', function (e) {
+    addEvent(container, 'mousedown', function (e) {
         if (isLeftButton(e)) {
             onDown(e);
         } else {
             onEnd(e, true);
         }
     });
-    container.addEventListener('touchstart', function (e) {
-        relayTouch(e, onDown);
+    addEvent(container, 'touchstart', function (e) {
+        return relayTouch(e, onDown);
     });
 
-    window.addEventListener('mousemove', function (e) {
+    addEvent(root, 'mousemove', function (e) {
         if (!dragState) {
             return;
         }
@@ -175,11 +177,11 @@ function dragTracker(options) {
                 onEnd(e);
             }
     });
-    window.addEventListener('touchmove', function (e) {
-        relayTouch(e, onMove);
+    addEvent(root, 'touchmove', function (e) {
+        return relayTouch(e, onMove);
     });
 
-    window.addEventListener('mouseup', function (e) {
+    addEvent(container, 'mouseup', function (e) {
         if (dragState && !isLeftButton(e)) {
             onEnd(e);
         }
@@ -187,13 +189,16 @@ function dragTracker(options) {
     function onTouchEnd(e, cancelled) {
         onEnd(tweakTouch(e), cancelled);
     }
-    container.addEventListener('touchend', function (e) {
+    addEvent(container, 'touchend', function (e) {
         return onTouchEnd(e);
     });
-    container.addEventListener('touchcancel', function (e) {
+    addEvent(container, 'touchcancel', function (e) {
         return onTouchEnd(e, true);
     });
 
+    function addEvent(target, type, handler) {
+        target.addEventListener(type, handler);
+    }
     function isLeftButton(e) {
         return e.buttons !== undefined ? e.buttons === 1 :
         e.which === 1;
