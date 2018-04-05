@@ -48,9 +48,7 @@ function dragTracker(options) {
             offsetToCenter = false;break;
     }
 
-    var dragged = void 0,
-        mouseOffset = void 0,
-        dragStart = void 0;
+    var dragState = void 0;
 
     function getMousePos(e, elm, offset, stayWithin) {
         var x = e.clientX,
@@ -95,59 +93,70 @@ function dragTracker(options) {
     }
 
     function onDown(e) {
+        var target = void 0;
         if (selector) {
-            dragged = selector instanceof Element ? selector.contains(e.target) ? selector : null : e.target.closest(selector);
+            target = selector instanceof Element ? selector.contains(e.target) ? selector : null : e.target.closest(selector);
         } else {
-            dragged = {};
+            target = {};
         }
 
-        if (dragged) {
+        if (target) {
             stopEvent(e);
 
-            mouseOffset = selector && handleOffset ? getMousePos(e, dragged) : [0, 0];
-            dragStart = getMousePos(e, container, mouseOffset);
-            if (roundCoords) {
-                dragStart = dragStart.map(Math.round);
-            }
+            var mouseOffset = selector && handleOffset ? getMousePos(e, target) : [0, 0],
+                startPos = getMousePos(e, container, mouseOffset);
+            dragState = {
+                target: target,
+                mouseOffset: mouseOffset,
+                startPos: startPos,
+                actuallyDragged: false
+            };
 
             if (callbackStart) {
-                callbackStart(dragged, dragStart);
+                callbackStart(target, startPos);
             }
         }
     }
 
     function onMove(e) {
-        if (!dragged) {
+        if (!dragState) {
             return;
         }
         stopEvent(e);
 
-        var pos = getMousePos(e, container, mouseOffset, !dragOutside);
-        callback(dragged, pos, dragStart);
+        var start = dragState.startPos,
+            pos = getMousePos(e, container, dragState.mouseOffset, !dragOutside);
+
+        dragState.actuallyDragged = dragState.actuallyDragged || start[0] !== pos[0] || start[1] !== pos[1];
+
+        callback(dragState.target, pos, start);
     }
 
-    function onEnd(e) {
-        if (!dragged) {
+    function onEnd(e, cancelled) {
+        if (!dragState) {
             return;
         }
 
         if (callbackEnd || callbackClick) {
-            var pos = getMousePos(e, container, mouseOffset, !dragOutside);
+            var isClick = !dragState.actuallyDragged,
+                pos = isClick ? dragState.startPos : getMousePos(e, container, dragState.mouseOffset, !dragOutside);
 
-            if (callbackClick && dragStart[0] === pos[0] && dragStart[1] === pos[1]) {
-                callbackClick(dragged, dragStart);
+            if (callbackClick && isClick && !cancelled) {
+                callbackClick(dragState.target, pos);
             }
             if (callbackEnd) {
-                callbackEnd(dragged, pos, dragStart);
+                callbackEnd(dragState.target, pos, dragState.startPos, cancelled || isClick && callbackClick);
             }
         }
-        dragged = null;
+        dragState = null;
     }
 
 
     container.addEventListener('mousedown', function (e) {
         if (isLeftButton(e)) {
             onDown(e);
+        } else {
+            onEnd(e, true);
         }
     });
     container.addEventListener('touchstart', function (e) {
@@ -155,7 +164,7 @@ function dragTracker(options) {
     });
 
     window.addEventListener('mousemove', function (e) {
-        if (!dragged) {
+        if (!dragState) {
             return;
         }
 
@@ -171,15 +180,19 @@ function dragTracker(options) {
     });
 
     window.addEventListener('mouseup', function (e) {
-        if (dragged && !isLeftButton(e)) {
+        if (dragState && !isLeftButton(e)) {
             onEnd(e);
         }
     });
-    function onTouchEnd(e) {
-        onEnd(tweakTouch(e));
+    function onTouchEnd(e, cancelled) {
+        onEnd(tweakTouch(e), cancelled);
     }
-    container.addEventListener('touchend', onTouchEnd);
-    container.addEventListener('touchcancel', onTouchEnd);
+    container.addEventListener('touchend', function (e) {
+        return onTouchEnd(e);
+    });
+    container.addEventListener('touchcancel', function (e) {
+        return onTouchEnd(e, true);
+    });
 
     function isLeftButton(e) {
         return e.buttons !== undefined ? e.buttons === 1 :
@@ -187,7 +200,7 @@ function dragTracker(options) {
     }
     function relayTouch(e, handler) {
         if (e.touches.length !== 1) {
-            onEnd(e);return;
+            onEnd(e, true);return;
         }
 
         handler(tweakTouch(e));

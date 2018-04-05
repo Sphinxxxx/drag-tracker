@@ -1,12 +1,34 @@
+/*global dragTracker*/
+/*global Vue*/
+
+
 /* Basic I: HTML element dragging */
 
 (function initDragHtml() {
+    const container = document.querySelector('#basic-html .container');
+
     dragTracker({
-        container: document.querySelector('#basic-html .container'),
+        container: container,
         selector: '.box',
         callback: (box, pos, start) => {
             box.style.left = pos[0] + 'px';
             box.style.top  = pos[1] + 'px';
+
+            //box.textContent += pos + ' ';
+        },
+
+        //Bonus: Cancel drag operations
+        callbackDragStart: (box, pos) => {
+            container.style.backgroundColor = '';
+
+            //box.textContent += pos + ' ';
+        },
+        callbackDragEnd: (box, pos, start, cancelled) => {
+            if(cancelled) {
+                container.style.backgroundColor = 'pink';
+                box.style.left = start[0] + 'px';
+                box.style.top  = start[1] + 'px';
+            }
         },
     });
 })();
@@ -91,7 +113,7 @@
                 _svgState.selectedNode = this.p;
             },
         }
-    })
+    });
     new Vue({
         el: '#advanced-vue',
         data: {
@@ -106,7 +128,7 @@
                 if(!obj) return '';
                 const pretty = JSON.stringify(obj, null, 2),
                       //Collapse simple arrays (arrays without objects or nested arrays) to one line:
-                      compact = pretty.replace(/\[[^[{]*?]/g, (match => match.replace(/\s+/g, ' ')))
+                      compact = pretty.replace(/\[[^[{]*?]/g, (match => match.replace(/\s+/g, ' ')));
 
                 return compact;
             }
@@ -134,6 +156,8 @@
             var event = document.createEvent('CustomEvent');
             event.initCustomEvent('dragging', true, false, { pos } );
             node.dispatchEvent(event);
+            
+            //alert('Click');
         },
     });
 

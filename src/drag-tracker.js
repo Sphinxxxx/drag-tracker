@@ -48,7 +48,7 @@ function dragTracker(options) {
     }
 
 
-    let dragged, mouseOffset, dragStart;
+    let dragState;
     
     function getMousePos(e, elm, offset, stayWithin) {
         let x = e.clientX,
@@ -97,65 +97,85 @@ function dragTracker(options) {
     }
 
     function onDown(e) {
+        let target;
         if(selector) {
-            dragged = (selector instanceof Element)
+            target = (selector instanceof Element)
                             ? (selector.contains(e.target) ? selector : null)
                             : e.target.closest(selector);
         }
         else {
             //No specific targets, just register dragging within the container. Create a dummy object so 'dragged' isn't falsy:
-            dragged = {};
+            target = {};
         }
 
-        if(dragged) {
+        if(target) {
             stopEvent(e);
-
-            mouseOffset = (selector && handleOffset) ? getMousePos(e, dragged) : [0, 0];
-            dragStart = getMousePos(e, container, mouseOffset);
-            if(roundCoords) { dragStart = dragStart.map(Math.round); }
             
+            const mouseOffset = (selector && handleOffset) ? getMousePos(e, target) : [0, 0],
+                  startPos = getMousePos(e, container, mouseOffset);
+            dragState = {
+                target,
+                mouseOffset,
+                startPos,
+                actuallyDragged: false,
+            };
+
             if(callbackStart) {
-                callbackStart(dragged, dragStart);
+                callbackStart(target, startPos);
             }
         }
     }
 
     function onMove(e) {
-        if(!dragged) { return; }
+        if(!dragState) { return; }
         stopEvent(e);
 
-        const pos = getMousePos(e, container, mouseOffset, !dragOutside);
-        callback(dragged, pos, dragStart);
+        const start = dragState.startPos,
+              pos = getMousePos(e, container, dragState.mouseOffset, !dragOutside);
+
+        //"touchmove" events can be fired even if the touched coordinate hasn't changed:
+        //  dragState.actuallyDragged = true;
+        dragState.actuallyDragged = dragState.actuallyDragged || (start[0] !== pos[0]) || (start[1] !== pos[1]);
+
+        callback(dragState.target, pos, start);
     }
 
-    function onEnd(e) {
-        if(!dragged) { return; }
+    function onEnd(e, cancelled) {
+        if(!dragState) { return; }
 
         if(callbackEnd || callbackClick) {
-            const pos = getMousePos(e, container, mouseOffset, !dragOutside);
+            const isClick = !dragState.actuallyDragged,
+                  pos = isClick ? dragState.startPos : getMousePos(e, container, dragState.mouseOffset, !dragOutside);
 
-            if(callbackClick && (dragStart[0] === pos[0]) && (dragStart[1] === pos[1])) {
-                callbackClick(dragged, dragStart);
+            if(callbackClick && isClick && !cancelled) {
+                callbackClick(dragState.target, pos);
             }
-            //Call callbackEnd even if this was only a click, because we already called callbackStart:
+            //Call callbackEnd even if this was only a click, because we already called callbackStart.
+            //If this was only a click *and that click was handled*, mark the drag as cancelled:
             if(callbackEnd) {
-                callbackEnd(dragged, pos, dragStart);
+                callbackEnd(dragState.target, pos, dragState.startPos, cancelled || (isClick && callbackClick));
             }
         }
-        dragged = null;
+        dragState = null;
     }
+
 
     /* Mouse/touch input */
 
     container.addEventListener('mousedown', function(e) {
-        if(isLeftButton(e)) { onDown(e); }
+        if(isLeftButton(e)) {
+            onDown(e);
+        }
+        else {
+            onEnd(e, true);
+        }
     });
     container.addEventListener('touchstart', function(e) {
         relayTouch(e, onDown);
     });
 
     window.addEventListener('mousemove', function(e) {
-        if(!dragged) { return; }
+        if(!dragState) { return; }
 
         if(isLeftButton(e)) { onMove(e); }
         //"mouseup" outside of window
@@ -167,11 +187,11 @@ function dragTracker(options) {
 
     window.addEventListener('mouseup', function(e) {
         //Here we check that the left button is *no longer* pressed:
-        if(dragged && !isLeftButton(e)) { onEnd(e); }
+        if(dragState && !isLeftButton(e)) { onEnd(e); }
     });
-    function onTouchEnd(e) { onEnd(tweakTouch(e)); }
-    container.addEventListener('touchend', onTouchEnd);
-    container.addEventListener('touchcancel', onTouchEnd);
+    function onTouchEnd(e, cancelled) { onEnd(tweakTouch(e), cancelled); }
+    container.addEventListener('touchend',    e => onTouchEnd(e));
+    container.addEventListener('touchcancel', e => onTouchEnd(e, true));
 
 
     function isLeftButton(e) {
@@ -182,7 +202,7 @@ function dragTracker(options) {
     }
     function relayTouch(e, handler) {
         //Don't interfere with pinch operations - those are probably handled somewhere else..
-        if(e.touches.length !== 1) { onEnd(e); return; }
+        if(e.touches.length !== 1) { onEnd(e, true); return; }
 
         handler(tweakTouch(e));
     }
