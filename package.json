@@ -1,6 +1,6 @@
 {
   "name": "drag-tracker",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "A simple library for dragging things around. Tracks dragging with touch or mouse.",
   "main": "dist/drag-tracker.js",
   "module": "src/drag-tracker.js",
@@ -9,6 +9,8 @@
     "dist/"
   ],
   "scripts": {
+    "prepublish": "bash ./scripts/prepub.sh",
+    "postpublish": "bash ./scripts/postpub.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
